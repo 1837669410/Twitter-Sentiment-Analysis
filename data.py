@@ -85,7 +85,7 @@ def load_data(train_path, val_path, words_frequency=5, max_text_length=20):
     print("y：\n{}".format(y_train[10:15]))
     print(x_train.shape, y_train.shape)
     print(x_val.shape, y_val.shape)
-
+    # 生成tf格式的训练数据
     db_train = tf.data.Dataset.from_tensor_slices((x_train, y_train))
     db_train = db_train.shuffle(50000).batch(128, drop_remainder=True)
     val_data = tf.data.Dataset.from_tensor_slices((x_val, y_val))
