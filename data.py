@@ -36,7 +36,7 @@ def clean_text(text):
     text = ' '.join(text.split())
     return text
 
-def translation_data(corpus, v2i, max_text_length):
+def padding_data(corpus, v2i, max_text_length):
     x_train = []
     for c in tqdm(corpus):
         temp = c.split(" ")
@@ -49,7 +49,7 @@ def translation_data(corpus, v2i, max_text_length):
         x_train.append(temp)
     return np.array(x_train)
 
-def load_data(train_path, val_path, words_frequency=5, max_text_length=20):
+def get_ori_data(train_path, val_path, words_frequency):
     train_data = pd.read_csv(train_path, names=['Tweet ID', 'entity', 'sentiment', 'Tweet Content'])
     val_data = pd.read_csv(val_path, names=['Tweet ID', 'entity', 'sentiment', 'Tweet Content'])
     # 1、处理缺失值
@@ -74,24 +74,26 @@ def load_data(train_path, val_path, words_frequency=5, max_text_length=20):
     i2v = {i+1:v for i, v in enumerate(words)}
     i2v[0] = "UNK"
     v2i = {v:i for i, v in i2v.items()}
-    # 4、将文本转化成可训练格式
+    return train_data, val_data, i2v, v2i
+
+def load_data(train_path, val_path, words_frequency=5, max_text_length=20):
+    # 1、获得数据原始信息
+    train_data, val_data, i2v, v2i = get_ori_data(train_path, val_path, words_frequency=words_frequency)
+    # 2、将文本转化成可训练格式
     train_corpus = [c for c in train_data.loc[:,"Tweet Content"]]
     val_corpus = [c for c in val_data.loc[:,"Tweet Content"]]
-    x_train = translation_data(train_corpus, v2i, max_text_length)
+    x_train = padding_data(train_corpus, v2i, max_text_length)
     y_train = np.array([sentiment_dict.get(v) for v in train_data.loc[:,"sentiment"]])
-    x_val = translation_data(val_corpus, v2i, max_text_length)
+    x_val = padding_data(val_corpus, v2i, max_text_length)
     y_val = np.array([sentiment_dict.get(v) for v in val_data.loc[:,"sentiment"]])
     print("x：\n{}".format(x_train[10:15,:]))
     print("y：\n{}".format(y_train[10:15]))
     print(x_train.shape, y_train.shape)
     print(x_val.shape, y_val.shape)
-    # 生成tf格式的训练数据
+    # 3、转化成tf格式的训练数据
     db_train = tf.data.Dataset.from_tensor_slices((x_train, y_train))
     db_train = db_train.shuffle(50000).batch(128, drop_remainder=True)
     val_data = tf.data.Dataset.from_tensor_slices((x_val, y_val))
     val_data = val_data.shuffle(1000).batch(128, drop_remainder=True)
 
     return db_train, val_data, len(v2i)
-
-if __name__ == "__main__":
-    load_data("twitter_training.csv", "twitter_validation.csv")
