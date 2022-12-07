@@ -76,7 +76,9 @@ def train():
             pred = tf.cast(tf.equal(pred, y), dtype=tf.int32)
             total_acc += tf.reduce_sum(pred)
             total_num += x.shape[0]
-        print("epoch: %d | acc:%.3f" % (e, total_acc / total_num))
+        print("epoch: %d | acc:%.3f"%(e, total_acc / total_num))
+
+    model.save_weights("./model/text_cnn.ckpt")
 
 if __name__ == "__main__":
     train()
