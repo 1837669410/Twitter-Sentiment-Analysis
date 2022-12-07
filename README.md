@@ -12,4 +12,4 @@ numpy 1.23.5
 
 # 架构图
 
-![textcnn架构图](E:\项目文件\Twitter Sentiment Analysis\static\textcnn架构图.png)
+![textcnn架构图](.//static/textcnn架构图.png)
