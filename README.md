@@ -6,6 +6,8 @@
 
 tensorflow 2.10.0
 
+pytorch 1.12.1+cu113
+
 pandas 1.3.0
 
 numpy 1.23.5
