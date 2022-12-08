@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import itertools
 import tensorflow as tf
+import torch
 from tqdm import tqdm
 
 sentiment_dict = {
@@ -76,7 +77,7 @@ def get_ori_data(train_path, val_path, words_frequency):
     v2i = {v:i for i, v in i2v.items()}
     return train_data, val_data, i2v, v2i
 
-def load_data(train_path, val_path, words_frequency=5, max_text_length=20):
+def load_data(train_path, val_path, words_frequency=5, max_text_length=20, framework="tf"):
     # 1、获得数据原始信息
     train_data, val_data, i2v, v2i = get_ori_data(train_path, val_path, words_frequency=words_frequency)
     # 2、将文本转化成可训练格式
@@ -91,9 +92,15 @@ def load_data(train_path, val_path, words_frequency=5, max_text_length=20):
     print(x_train.shape, y_train.shape)
     print(x_val.shape, y_val.shape)
     # 3、转化成tf格式的训练数据
-    db_train = tf.data.Dataset.from_tensor_slices((x_train, y_train))
-    db_train = db_train.shuffle(50000).batch(128, drop_remainder=True)
-    val_data = tf.data.Dataset.from_tensor_slices((x_val, y_val))
-    val_data = val_data.shuffle(1000).batch(128, drop_remainder=True)
-
-    return db_train, val_data, len(v2i)
+    if framework == "tf":
+        db_train = tf.data.Dataset.from_tensor_slices((x_train, y_train))
+        db_train = db_train.shuffle(50000).batch(128, drop_remainder=True)
+        db_val = tf.data.Dataset.from_tensor_slices((x_val, y_val))
+        db_val = db_val.shuffle(1000).batch(128, drop_remainder=True)
+        return db_train, db_val, len(v2i)
+    if framework == "torch":
+        x_train, y_train, x_val, y_val = torch.LongTensor(x_train), torch.LongTensor(y_train), torch.LongTensor(x_val), torch.LongTensor(y_val)
+        db_train, db_val = torch.utils.data.TensorDataset(x_train, y_train), torch.utils.data.TensorDataset(x_val, y_val)
+        db_train = torch.utils.data.DataLoader(db_train, batch_size=128, shuffle=True, drop_last=True)
+        db_val = torch.utils.data.DataLoader(db_val, batch_size=128, shuffle=True, drop_last=True)
+        return db_train, db_val, len(v2i)
