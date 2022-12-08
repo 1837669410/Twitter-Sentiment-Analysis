@@ -17,9 +17,6 @@ class TextCNN(nn.Module):
         self.conv21 = nn.Conv2d(in_channels=1, out_channels=units, kernel_size=(2,out_dim), stride=1, padding=0)
         self.conv22 = nn.Conv2d(in_channels=1, out_channels=units, kernel_size=(3,out_dim), stride=1, padding=0)
         self.conv23 = nn.Conv2d(in_channels=1, out_channels=units, kernel_size=(4,out_dim), stride=1, padding=0)
-
-        self.conv1 = [nn.Conv2d(in_channels=1, out_channels=units, kernel_size=(i,out_dim), stride=1, padding=0).cuda() for i in [2,3,4]]
-        self.conv2 = [nn.Conv2d(in_channels=1, out_channels=units, kernel_size=(i,out_dim), stride=1, padding=0).cuda() for i in [2,3,4]]
         # pool
         self.pool1 = [nn.MaxPool2d(kernel_size=(i,1), stride=1, padding=0) for i in [19,18,17]]
         self.pool2 = [nn.MaxPool2d(kernel_size=(i,1), stride=1, padding=0) for i in [19,18,17]]
@@ -40,7 +37,7 @@ class TextCNN(nn.Module):
         # embedding [None step] -> [None step out_dim] -> [None 1 step out_dim]
         emb = self.embedding(x)
         emb = torch.unsqueeze(emb, dim=1)
-        # # conv
+        # conv
         out11, out12, out13 = self.relu(self.conv11(emb)), self.relu(self.conv12(emb)), self.relu(self.conv13(emb))
         out21, out22, out23 = self.relu(self.conv21(emb)), self.relu(self.conv22(emb)), self.relu(self.conv23(emb))
         # pool
@@ -84,7 +81,6 @@ def train():
             total_acc += acc
             total_num += x.shape[0]
         print("epoch: %d | acc:%.3f" % (e, total_acc / total_num))
-
 
 if __name__ == "__main__":
     train()
