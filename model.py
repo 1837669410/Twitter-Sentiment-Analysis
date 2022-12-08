@@ -52,7 +52,7 @@ class TextCNN(keras.Model):
 def train():
     epoch = 10
     set_soft_gpu(True)
-    db_train, db_val, vocab_num = load_data("twitter_training.csv", "twitter_validation.csv", max_text_length=20)
+    db_train, db_val, vocab_num = load_data("twitter_training.csv", "twitter_validation.csv", max_text_length=20, framework="tf")
     model = TextCNN(vocab_num=vocab_num, out_dim=64, units=100, dropout_rate=0.5, l_rate=0.0003, decay=0.001)
     model.build(input_shape=[128, 20])
     model.summary()
