@@ -56,6 +56,7 @@ def train():
     model = TextCNN(vocab_num=vocab_num, out_dim=64, units=100, dropout_rate=0.5, l_rate=0.0003, decay=0.001)
     model.build(input_shape=[128, 20])
     model.summary()
+    print(model.embedding.trainable_variables)
     for e in range(epoch):
         for step, (x,y) in enumerate(db_train):
             with tf.GradientTape() as tape:
