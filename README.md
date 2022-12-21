@@ -1,6 +1,18 @@
 # Twitter-Sentiment-Analysis
 
-**代码还没有修改完毕，大致结果能实现了95%左右的val_acc，但是datalaod代码比较混乱，有时间会修改后在更新**
+**代码已经全部修改完毕，torch版本的可以得到93%左右的acc，tf版本的可以得到95+%左右的acc**
+
+# 文件
+
+- model：存放tf训练出来的model，textcnn.ckpt
+- static：存放图片等静态文件
+- data.py：生成torch和tf所使用的数据
+- model_tf.py：textcnn的tensorflow代码
+- model_torch.py：textcnn的pytorch代码
+- plot_model.py：绘制模型图的代码
+- twitter_training.csv：训练数据
+- twitter_validation.csv：验证数据
+- utils.py：设置gpu模式代码和pytoch模型所需的one_hot函数
 
 # 依赖
 
